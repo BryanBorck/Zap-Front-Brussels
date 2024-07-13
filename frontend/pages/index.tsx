@@ -6,9 +6,6 @@ import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 
 export default function Home() {
-  // const { response } = useContext(ExtensionContext);
-  // const [history, setHistory] = useState(null);
-  // const [error, setError] = useState(null);
 
   const [client, setClient] = useState(null);
 
@@ -57,20 +54,6 @@ export default function Home() {
    });
   }
 
-  // const handleFetchHistory = async () => {
-  //   try {
-  //     const result: any = await getHistoryFromExtension(
-  //       "GET",
-  //       "https://example.com",
-  //       null
-  //     );
-  //     setHistory(result);
-  //     setError(null);
-  //   } catch (err: any) {
-  //     setError(err.message);
-  //     setHistory(null);
-  //   }
-  // };
 
   useEffect(() => {
     const getHistoryA = async () => {
@@ -90,8 +73,6 @@ export default function Home() {
         //tlsn.disconnect();
 
         const clientA = await tlsn.connect(); 
-        console.log("clientA", clientA);
-        console.log("BBBBBBBBBBBBBBB")
 
         setClient(clientA); 
 
