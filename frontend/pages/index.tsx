@@ -1,7 +1,7 @@
 "use client";
 
 // import Footer from "@/components/Footer";
-import { ExtensionContext } from "@/contexts";
+import { ExtensionContext, ExtensionProvider } from "@/contexts";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 
@@ -10,50 +10,52 @@ export default function Home() {
   // const [history, setHistory] = useState(null);
   // const [error, setError] = useState(null);
 
-  // function getHistoryFromExtension(
-  //   method: any,
-  //   url: any,
-  //   metadata: any = null
-  // ) {
-  //   return new Promise((resolve, reject) => {
-  //     // Create a unique request ID
-  //     const requestId = Math.random().toString(36).substr(2, 9);
+  const [client, setClient] = useState(null);
 
-  //     // Listen for the response
-  //     function handleResponse(event: any) {
-  //       if (
-  //         event.data &&
-  //         event.data.tlsnrpc === "1.0" &&
-  //         event.data.id === requestId
-  //       ) {
-  //         window.removeEventListener("message", handleResponse);
-  //         console.log("event.data", event.data);
-  //         if (event.data.error) {
-  //           reject(event.data.error);
-  //         } else {
-  //           resolve(event.data.result);
-  //         }
-  //       }
-  //     }
+  function getHistoryFromExtension(
+    method: any,
+    url: any,
+    metadata: any = null
+  ) {
+    return new Promise((resolve, reject) => {
+      //Create a unique request ID
+      const requestId = Math.random().toString(36).substr(2, 9);
 
-  //     window.addEventListener("message", handleResponse);
+      //Listen for the response
+      function handleResponse(event: any) {
+        if (
+          event.data &&
+          event.data.tlsnrpc === "1.0" &&
+          event.data.id === requestId
+        ) {
+          window.removeEventListener("message", handleResponse);
+          console.log("event.data", event.data);
+          if (event.data.error) {
+            reject(event.data.error);
+          } else {
+            resolve(event.data.result);
+          }
+        }
+      }
 
-  //     // Send the request
-  //     window.postMessage(
-  //       {
-  //         tlsnrpc: "1.0",
-  //         id: requestId,
-  //         method: "tlsn/cs/connect",
-  //         params: {
-  //           method,
-  //           url,
-  //           metadata,
-  //         },
-  //       },
-  //       "*"
-  //     );
-  //   });
-  // }
+      window.addEventListener("message", handleResponse);
+
+     // Send the request
+     window.postMessage(
+       {
+         tlsnrpc: "1.0",
+         id: requestId,
+         method: "tlsn/cs/connect",
+         params: {
+           method,
+           url,
+           metadata,
+         },
+       },
+       "*"
+     );
+   });
+  }
 
   // const handleFetchHistory = async () => {
   //   try {
@@ -71,24 +73,41 @@ export default function Home() {
   // };
 
   useEffect(() => {
+    const getHistoryA = async () => {
+      console.log("client", client);
+      if(client){
+        const response = await (client as any).getHistory("GET", "**");
+        console.log("response", response);
+      }
+    }
+    getHistoryA();
+  }, [client]);
+
+  useEffect(() => {
     const connectToTLSN = async () => {
       try {
         // @ts-ignore
-        const client = await tlsn.connect();
-        console.log("client", client);
+        //tlsn.disconnect();
+
+        const clientA = await tlsn.connect(); 
+        console.log("clientA", clientA);
+        console.log("BBBBBBBBBBBBBBB")
+
+        setClient(clientA); 
+
+        
+        //console.log("client", client);
         // Use the client for further interactions
       } catch (error) {
         console.error("Error connecting to TLSN:", error);
       }
     };
+
+    console.log("tlsn AAAA");
     connectToTLSN();
+
+  //@ts-ignore
   }, []);
-
-  // // @ts-ignore
-  // const client = await window.tlsn.connect();
-
-  // // @ts-ignore
-  // console.log("client", client);
 
   return (
     <main className="relative flex min-h-screen flex-col items-center overflow-hidden w-full px-6 lg:px-36">
