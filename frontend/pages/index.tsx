@@ -4,62 +4,56 @@
 import { ExtensionContext, ExtensionProvider } from "@/contexts";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
-
+import { Safe4337Pack } from "@safe-global/relay-kit";
+import { extractPasskeyData } from "@safe-global/protocol-kit";
+ 
 export default function Home() {
 
   const [client, setClient] = useState(null);
 
-  function getHistoryFromExtension(
-    method: any,
-    url: any,
-    metadata: any = null
-  ) {
-    return new Promise((resolve, reject) => {
-      //Create a unique request ID
-      const requestId = Math.random().toString(36).substr(2, 9);
+  async function createPassKey() {
 
-      //Listen for the response
-      function handleResponse(event: any) {
-        if (
-          event.data &&
-          event.data.tlsnrpc === "1.0" &&
-          event.data.id === requestId
-        ) {
-          window.removeEventListener("message", handleResponse);
-          console.log("event.data", event.data);
-          if (event.data.error) {
-            reject(event.data.error);
-          } else {
-            resolve(event.data.result);
+    const displayName = 'Safe SmartAccount'
+
+    const passkeyCredential= await navigator.credentials.create({
+      publicKey: {
+        pubKeyCredParams: [
+          {
+            // ECDSA w/ SHA-256: https://datatracker.ietf.org/doc/html/rfc8152#section-8.1
+            alg: -7,
+            type: 'public-key'
           }
-        }
+        ],
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        rp: {
+          name: 'Safe SmartAccount'
+        },
+        user: {
+          displayName,
+          id: crypto.getRandomValues(new Uint8Array(32)),
+          name: displayName
+        },
+        timeout: 60_000,
+        attestation: 'none'
       }
+    })
 
-      window.addEventListener("message", handleResponse);
+    const passkey = await extractPasskeyData(passkeyCredential as Credential);
+    console.log("passkey", passkey);
+    return passkey;
 
-     // Send the request
-     window.postMessage(
-       {
-         tlsnrpc: "1.0",
-         id: requestId,
-         method: "tlsn/cs/connect",
-         params: {
-           method,
-           url,
-           metadata,
-         },
-       },
-       "*"
-     );
-   });
   }
 
+
+
+
+  
 
   useEffect(() => {
     const getHistoryA = async () => {
       console.log("client", client);
       if(client){
-        const response = await (client as any).getHistory("GET", "**");
+        const response = await (client as any).getHistory("GET", "**")
         console.log("response", response);
       }
     }
@@ -105,6 +99,8 @@ export default function Home() {
       <div className="relative z-10 w-full pt-24 pb-12 lg:pt-[140px] lg:pb-[100px]">
         <p className="text-red-500">aaa HOME</p>
       </div>
+      <button onClick={createPassKey}>Create Passkey</button>
+
 
       {/* <div className="w-full max-w-screen-2xl flex flex-col items-center">
         <Footer />
