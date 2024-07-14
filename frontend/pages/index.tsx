@@ -44,45 +44,67 @@ export default function Home() {
 
   }
 
+  async function connectTlsn(){
+    // @ts-ignore
+    const clientA = await tlsn.connect();
+
+    setClient(clientA);
+
+  }
+
+  async function getHistory(){
+
+    const response = await (client as any).getHistory("GET", "**")
+    console.log("response", response);
+
+  }
+
+  async function getZap(){
+      
+      const response = await (client as any).getZap("www.example.com")
+      console.log("response", response);
+  
+    }
+
 
 
 
   
 
-  useEffect(() => {
-    const getHistoryA = async () => {
-      console.log("client", client);
-      if(client){
-        const response = await (client as any).getHistory("GET", "**")
-        console.log("response", response);
-      }
-    }
-    getHistoryA();
-  }, [client]);
+  // useEffect(() => {
+  //   const getHistoryA = async () => {
+  //     console.log("client", client);
+  //     if(client){
+  //       const response = await (client as any).getHistory("GET", "**")
+  //       console.log("response", response);
+  //     }
+  //   }
+  //   getHistoryA();
+  // }, [client]);
 
-  useEffect(() => {
-    const connectToTLSN = async () => {
-      try {
-        // @ts-ignore
-        //tlsn.disconnect();
+  // useEffect(() => {
+  //   const connectToTLSN = async () => {
+  //     try {
+  //       // @ts-ignore
+  //       //tlsn.disconnect();
 
-        const clientA = await tlsn.connect(); 
+  //       const clientA = await tlsn.connect(); 
 
-        setClient(clientA); 
+  //       setClient(clientA); 
 
         
-        //console.log("client", client);
-        // Use the client for further interactions
-      } catch (error) {
-        console.error("Error connecting to TLSN:", error);
-      }
-    };
+  //       //console.log("client", client);
+  //       // Use the client for further interactions
+  //     } catch (error) {
+  //       console.error("Error connecting to TLSN:", error);
+  //     }
+  //   };
 
-    console.log("tlsn AAAA");
-    connectToTLSN();
+  //   console.log("tlsn AAAA");
+  //   connectToTLSN();
 
-  //@ts-ignore
-  }, []);
+  // //@ts-ignore
+  // }, []);
 
   return (
     <main className="relative flex min-h-screen flex-col items-center overflow-hidden w-full px-6 lg:px-36">
@@ -100,6 +122,9 @@ export default function Home() {
         <p className="text-red-500">aaa HOME</p>
       </div>
       <button onClick={createPassKey}>Create Passkey</button>
+      <button onClick={connectTlsn}>Connect TLSN</button>
+      <button onClick={getHistory}>Get History</button>
+      <button onClick={getZap}>GetZap</button>
 
 
       {/* <div className="w-full max-w-screen-2xl flex flex-col items-center">
