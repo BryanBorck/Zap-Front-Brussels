@@ -126,7 +126,7 @@ export default function AppPage() {
           </SlideBottom> */}
           <div className="w-[1000px] rounded-md bg-black/15 backdrop-blur-md shadow-xl p-12 flex flex-col items-center justify-start">
             <SlideBottom
-              delay={0.4}
+              delay={0.2}
               className="text-2xl font-bold text-lime-400"
             >
               Get the proof of your accounts
@@ -134,7 +134,10 @@ export default function AppPage() {
             <div className="flex flex-col items-center space-y-6 mt-12">
               {/* Instagram */}
 
-              <div className="flex flex-row space-x-6 items-center">
+              <SlideBottom
+                delay={0.4}
+                className="flex flex-row space-x-6 items-center"
+              >
                 <Image
                   unoptimized
                   fetchPriority="high"
@@ -179,11 +182,14 @@ export default function AppPage() {
                     <CircleCheckBig size={20} />
                   )}
                 </div>
-              </div>
+              </SlideBottom>
 
               {/* Twitter */}
 
-              <div className="flex flex-row space-x-6 items-center">
+              <SlideBottom
+                delay={0.6}
+                className="flex flex-row space-x-6 items-center"
+              >
                 <Image
                   unoptimized
                   fetchPriority="high"
@@ -228,11 +234,14 @@ export default function AppPage() {
                     <CircleCheckBig size={20} />
                   )}
                 </div>
-              </div>
+              </SlideBottom>
 
               {/* Google */}
 
-              <div className="flex flex-row space-x-6 items-center">
+              <SlideBottom
+                delay={0.8}
+                className="flex flex-row space-x-6 items-center"
+              >
                 <Image
                   unoptimized
                   fetchPriority="high"
@@ -277,11 +286,14 @@ export default function AppPage() {
                     <CircleCheckBig size={20} />
                   )}
                 </div>
-              </div>
+              </SlideBottom>
 
               {/* Twitter */}
 
-              <div className="flex flex-row space-x-6 items-center">
+              <SlideBottom
+                delay={1}
+                className="flex flex-row space-x-6 items-center"
+              >
                 <Image
                   unoptimized
                   fetchPriority="high"
@@ -326,7 +338,7 @@ export default function AppPage() {
                     <CircleCheckBig size={20} />
                   )}
                 </div>
-              </div>
+              </SlideBottom>
             </div>
           </div>
         </div>
