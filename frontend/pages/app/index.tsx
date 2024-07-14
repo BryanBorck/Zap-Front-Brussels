@@ -6,6 +6,22 @@ import { SlideBottom } from "../../components/Slide";
 import Link from "next/link";
 import React from "react";
 import { CircleX, CircleCheckBig, Loader2 } from "lucide-react";
+import { Safe4337Pack } from '@safe-global/relay-kit'
+import {  PasskeyArgType, extractPasskeyData } from '@safe-global/protocol-kit'
+import { encodeFunctionData } from 'viem'
+
+const RP_NAME = 'Safe Smart Account'
+const USER_DISPLAY_NAME = 'Luiz'
+const USER_NAME = 'Luiz'
+
+export const STORAGE_PASSKEY_LIST_KEY = 'safe_passkey_list'
+export const RPC_URL = 'https://ethereum-sepolia-rpc.publicnode.com'
+export const CHAIN_NAME = 'sepolia'
+export const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f' // SEPOLIA
+export const BUNDLER_URL = `https://api.pimlico.io/v1/${CHAIN_NAME}/rpc?apikey=${process.env.NEXT_PUBLIC_PIMLICO_API_KEY}`
+export const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${process.env.NEXT_PUBLIC_PIMLICO_API_KEY}`
+export const NFT_ADDRESS = '0xBb9ebb7b8Ee75CDBf64e5cE124731A89c2BC4A07'
+
 
 export default function AppPage() {
   const [loading, setLoading] = useState(false);
@@ -13,8 +29,159 @@ export default function AppPage() {
   const [client, setClient] = useState(null);
   const [selected, setSelected] = useState("");
   const [index, setIndex] = useState(0);
+  const [passkey, setPasskey] = useState<any>(null);
 
-  const incrementStep = (index) => {
+
+  const [passkeyCredential, setPasskeyCredential] = useState<any>(null);
+
+  async function createPasskey (): Promise<PasskeyArgType> {
+    const displayName = 'Safe Owner' // This can be customized to match, for example, a user name.
+    // Generate a passkey credential using WebAuthn API
+    const passkeyCredential = await navigator.credentials.create({
+      publicKey: {
+        pubKeyCredParams: [
+          {
+            // ECDSA w/ SHA-256: https://datatracker.ietf.org/doc/html/rfc8152#section-8.1
+            alg: -7,
+            type: 'public-key'
+          }
+        ],
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        rp: {
+          name: 'Safe SmartAccount'
+        },
+        user: {
+          displayName,
+          id: crypto.getRandomValues(new Uint8Array(32)),
+          name: displayName
+        },
+        timeout: 60_000,
+        attestation: 'none'
+      }
+    })
+  
+    if (!passkeyCredential) {
+      throw Error('Passkey creation failed: No credential was returned.')
+    }
+    console.log('passkeyCredential: ', passkeyCredential)
+  
+    const passkey = await extractPasskeyData(passkeyCredential)
+
+    
+
+    setPasskey(passkey);
+    console.log("Created Passkey: ", passkey)
+  
+    return passkey
+  }
+
+  const mintNFT = async () => {
+    const safe4337Pack = await Safe4337Pack.init({
+      provider: RPC_URL,
+      signer: passkey,
+      bundlerUrl: BUNDLER_URL,
+      paymasterOptions: {
+        isSponsored: true,
+        paymasterUrl: PAYMASTER_URL,
+        paymasterAddress: PAYMASTER_ADDRESS,
+        sponsorshipPolicyId: 'sp_early_synch'
+      },
+      options: {
+        owners: [
+          /* Other owners... */
+        ],
+        threshold: 1
+      }
+    })
+
+    const safeAddress = await safe4337Pack.protocolKit.getAddress();
+
+
+  
+    const mintNFTTransaction = {
+      to: NFT_ADDRESS,
+      data: encodeSafeMintData(safeAddress),
+      value: '0'
+    }
+  
+    const safeOperation = await safe4337Pack.createTransaction({
+      transactions: [mintNFTTransaction]
+    })
+  
+    const signedSafeOperation = await safe4337Pack.signSafeOperation(
+      safeOperation
+    )
+  
+    console.log('SafeOperation', signedSafeOperation)
+  
+    // 4) Execute SafeOperation
+    const userOperationHash = await safe4337Pack.executeTransaction({
+      executable: signedSafeOperation
+    })
+  
+    return userOperationHash
+  }
+  
+  /**
+   * Encodes the data for a safe mint operation.
+   * @param to The address to mint the token to.
+   * @param tokenId The ID of the token to mint.
+   * @returns The encoded data for the safe mint operation.
+   */
+  function encodeSafeMintData(
+    to: string,
+    tokenId: bigint = getRandomUint256()
+  ): string {
+    return encodeFunctionData({
+      abi: [
+        {
+          constant: false,
+          inputs: [
+            {
+              name: 'to',
+              type: 'address'
+            },
+            {
+              name: 'tokenId',
+              type: 'uint256'
+            }
+          ],
+          name: 'safeMint',
+          payable: false,
+          stateMutability: 'nonpayable',
+          type: 'function'
+        }
+      ],
+      functionName: 'safeMint',
+      args: [to, tokenId]
+    })
+  }
+  
+  /**
+   * Generates a random 256-bit unsigned integer.
+   *
+   * @returns {bigint} A random 256-bit unsigned integer.
+   *
+   * This function uses the Web Crypto API's `crypto.getRandomValues()` method to generate
+   * a uniformly distributed random value within the range of 256-bit unsigned integers
+   * (from 0 to 2^256 - 1).
+   */
+  function getRandomUint256(): bigint {
+    const dest = new Uint8Array(32) // Create a typed array capable of storing 32 bytes or 256 bits
+  
+    crypto.getRandomValues(dest) // Fill the typed array with cryptographically secure random values
+  
+    let result = BigInt(0);
+    for (let i = 0; i < dest.length; i++) {
+      result |= BigInt(dest[i]) << BigInt(8 * i) // Combine individual bytes into one bigint
+    }
+  
+    return result
+  }
+
+
+
+  const incrementStep = (index: any) => {
     const newSteps = [...steps];
     newSteps[index] += 1;
     setSteps(newSteps);
@@ -348,6 +515,18 @@ export default function AppPage() {
                   )}
                 </div>
               </SlideBottom>
+              <button
+                  onClick={createPasskey}
+                  className={`hover:bg-transparent hover:text-blue-900 hover:border-blue-900 text-[1.25em] cursor-pointer bg-blue-900 text-lime-400 font-bold py-1 w-[300px] rounded-md shadow-lg border-[2px] border-transparent transition-all duration-500 ease-in-out disabled:border-gray-400 disabled:bg-gray-400 disabled:text-white`}
+                >
+                  Create passkey
+                </button>
+                <button
+                  onClick={mintNFT}
+                  className={`hover:bg-transparent hover:text-blue-900 hover:border-blue-900 text-[1.25em] cursor-pointer bg-blue-900 text-lime-400 font-bold py-1 w-[300px] rounded-md shadow-lg border-[2px] border-transparent transition-all duration-500 ease-in-out disabled:border-gray-400 disabled:bg-gray-400 disabled:text-white`}
+                >
+                  Mint Attestation
+                </button>
             </div>
           </div>
         </div>
