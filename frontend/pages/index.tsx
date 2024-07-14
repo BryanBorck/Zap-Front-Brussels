@@ -17,16 +17,18 @@ export default function Home() {
         height={100}
         className="absolute top-0 right-0 w-full z-0"
       />
-      <Image
-        unoptimized
-        fetchPriority="high"
-        loading="lazy"
-        src="/ZapNetwork.png"
-        alt=""
-        width={100}
-        height={100}
-        className="absolute top-6 left-6 h-12 w-auto z-20"
-      />
+      <Link href="/">
+        <Image
+          unoptimized
+          fetchPriority="high"
+          loading="lazy"
+          src="/ZapNetwork.png"
+          alt=""
+          width={100}
+          height={100}
+          className="absolute top-6 left-6 h-12 w-auto z-20"
+        />
+      </Link>
       <div className="relative z-10 w-full pt-24 pb-12 lg:pt-[180px] lg:pb-[100px] flex items-center justify-center">
         <div className="text-center p-8">
           <SlideBottom delay={0.2} className="text-4xl font-bold text-lime-400">
