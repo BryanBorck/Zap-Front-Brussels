@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps: { ...pageProps } }: AppProps) {
     <ExtensionProvider>
       <Head>
         <title>Zap</title>
-        {/* <link rel="icon" type="image/png" sizes="32x32" href="/icon.png" /> */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png" />
       </Head>
       {/* <Header /> */}
       <Component {...pageProps} />
