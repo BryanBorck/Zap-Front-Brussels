@@ -25,13 +25,13 @@ export default function AppPage() {
     if (client) {
       let url = "";
       if (selected === "Instagram") {
-        url = "https://www.instagram.com";
+        url = "www.instagram.com";
       }
       if (selected === "Twitter") {
-        url = "https://x.com";
+        url = "www.x.com";
       }
       if (selected === "Google") {
-        url = "https://mail.google.com";
+        url = "www.mail.google.com";
       }
       if (selected === "Discord") {
         url = "";
