@@ -61,7 +61,7 @@ export default function Home() {
 
   async function getZap(){
       
-      const response = await (client as any).getZap("www.example.com")
+      const response = await (client as any).getZap("www.twitter.com")
       console.log("response", response);
   
     }
