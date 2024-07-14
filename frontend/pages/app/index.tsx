@@ -20,6 +20,15 @@ export default function AppPage() {
     setSteps(newSteps);
   };
 
+  const handleMint = async (value: number) => {
+    console.log("client", client);
+    if (client) {
+      const response = await (client as any).mintAttestation("", "", "");
+      console.log("response", response);
+    }
+    incrementStep(value);
+  };
+
   const handleZap = async (value: number) => {
     console.log("client", client);
     if (client) {
@@ -90,7 +99,7 @@ export default function AppPage() {
       await handleZap(value);
     }
     if (steps[value] === 2) {
-      console.log("minting proof PARABENS");
+      await handleMint(value);
     }
     setLoading(false);
   };
@@ -162,7 +171,7 @@ export default function AppPage() {
                       : "hover:bg-transparent hover:text-blue-900 hover:border-blue-900"
                   } text-[1.25em] cursor-pointer bg-blue-900 text-lime-400 font-bold py-1 w-[300px] rounded-md shadow-lg border-[2px] border-transparent transition-all duration-500 ease-in-out disabled:border-gray-400 disabled:bg-gray-400 disabled:text-white`}
                 >
-                  {loading ? (
+                  {loading && index === 1 ? (
                     <div className="flex flex-row items-center justify-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Please wait
@@ -214,7 +223,7 @@ export default function AppPage() {
                       : "hover:bg-transparent hover:text-blue-900 hover:border-blue-900"
                   } text-[1.25em] cursor-pointer bg-blue-900 text-lime-400 font-bold py-1 w-[300px] rounded-md shadow-lg border-[2px] border-transparent transition-all duration-500 ease-in-out disabled:border-gray-400 disabled:bg-gray-400 disabled:text-white`}
                 >
-                  {loading ? (
+                  {loading && index === 1 ? (
                     <div className="flex flex-row items-center justify-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Please wait
@@ -266,7 +275,7 @@ export default function AppPage() {
                       : "hover:bg-transparent hover:text-blue-900 hover:border-blue-900"
                   } text-[1.25em] cursor-pointer bg-blue-900 text-lime-400 font-bold py-1 w-[300px] rounded-md shadow-lg border-[2px] border-transparent transition-all duration-500 ease-in-out disabled:border-gray-400 disabled:bg-gray-400 disabled:text-white`}
                 >
-                  {loading ? (
+                  {loading && index === 2 ? (
                     <div className="flex flex-row items-center justify-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Please wait
@@ -318,7 +327,7 @@ export default function AppPage() {
                       : "hover:bg-transparent hover:text-blue-900 hover:border-blue-900"
                   } text-[1.25em] cursor-pointer bg-blue-900 text-lime-400 font-bold py-1 w-[300px] rounded-md shadow-lg border-[2px] border-transparent transition-all duration-500 ease-in-out disabled:border-gray-400 disabled:bg-gray-400 disabled:text-white`}
                 >
-                  {loading ? (
+                  {loading && index === 3 ? (
                     <div className="flex flex-row items-center justify-center">
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Please wait
